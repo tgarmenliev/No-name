@@ -20,7 +20,6 @@ import STT
 from STT import speechToText
 
 class SpeechApp(App):
-    i = 0
     def stop_recording(self, instance):
         recordingState.in_progress = False
         self.main_page(instance)
@@ -73,7 +72,7 @@ class SpeechApp(App):
         os.chdir(curr_path)
         list_of_files = os.listdir()
         for index in range(0, len(list_of_files)):
-            self.button = Button(text = os.path.splitext(list_of_files[index])[0])
+            self.button = Button(text = list_of_files[index])
             self.button.bind(on_press=self.recording)
             self.window.add_widget(self.button)  
         os.chdir(old_path)      
