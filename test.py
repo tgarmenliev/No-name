@@ -70,27 +70,28 @@ class SpeechApp(App):
         self.window.clear_widgets()
         #self.window.orientation = 'vertical'
         self.window.orientation = 'horizontal'
-        layout = GridLayout(size_hint_y = None, cols=1) 
-        #layout.bind(minimum_height = self.window.setter('height'))
-       # layout.orientation = 'vertical'
-        self.button = Button(text = "Go back", height = self.window.height, width = self.window.width)
-        self.button.bind(on_press=self.main_page)
-        self.window.add_widget(self.button)
-        self.buttons=[]
         old_path = os.getcwd()
         curr_path = os.getcwd() + "\Recordings"
         if os.path.isdir(curr_path)==False:
             os.mkdir(curr_path)
         os.chdir(curr_path)
         list_of_files = os.listdir()
+        layout = GridLayout(size_hint_y = None, cols=1,height=100*len(list_of_files)) 
+        #layout.bind(minimum_height = self.window.setter('height'))
+       # layout.orientation = 'vertical'
+        self.button = Button(text = "Go back", height = self.window.height, width = self.window.width)
+        self.button.bind(on_press=self.main_page)
+        self.window.add_widget(self.button)
+        self.buttons=[]
+        
         #list_of_files.reverse()
        # self.path=list_of_files
         for index in range(0,len(list_of_files)):
-            self.buttons.append(Button(text = list_of_files[index], size_hint_y = None, height = 100))
+            self.buttons.append(Button(text = list_of_files[index],size_hint_y=None, height = 100))
             self.buttons[index].bind(on_press=partial(self.recording,path=list_of_files[index]))
             layout.add_widget(self.buttons[index])  
         os.chdir(old_path) 
-        root=ScrollView(size_hint=(1,1), size = (Window.size))
+        root=ScrollView(size_hint=(1,1), size = (Window.size),do_scroll_x=False,do_scroll_y=True)
         root.add_widget(layout) 
         self.window.add_widget(root)
         return self.window
