@@ -8,15 +8,19 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
+from kivy.graphics import Color, Rectangle
+from kivy.uix.floatlayout import FloatLayout
 
+import os
+import sys
 from threading import Thread
 
 import recordingState
 import STT
 from STT import speechToText
 
-class Interface(App):
-
+class SpeechApp(App):
+    i = 0
     def stop_recording(self, instance):
         recordingState.in_progress = False
         self.main_page(instance)
@@ -40,17 +44,18 @@ class Interface(App):
     
     def main_page(self, instance):
         self.window.clear_widgets()
-        self.button = Button(text = 'View recordings')
-        self.button.bind(on_press=self.view_recordings)
-        self.window.add_widget(self.button)
-        self.button = Button(text = 'Make new recording')
-        self.button.bind(on_press = self.start_recording)
-        self.window.add_widget(self.button)
+        self.window.orientation = 'horizontal'
+        self.button1 = Button(text = 'View recordings')
+        self.button1.bind(on_press=self.view_recordings)
+        self.window.add_widget(self.button1)
+        self.button2 = Button(text = 'Make new recording')
+        self.button2.bind(on_press = self.start_recording)
+        self.window.add_widget(self.button2)
         return self.window
 
     def build(self):
         self.window = BoxLayout()
-        self.window.cols = 1
+        self.window.cols = 2
         self.button = Button(text = 'Get started')
         self.button.bind(on_press=self.main_page)
         self.window.add_widget(self.button)
@@ -58,12 +63,36 @@ class Interface(App):
 
     def view_recordings(self, instance):
         self.window.clear_widgets()
-        self.window = BoxLayout()
+        self.window.orientation = 'vertical'
         self.button = Button(text = "Go back")
         self.button.bind(on_press=self.main_page)
-        self.window.add_widget(self.button)
-        self.window.add_widget(Label(text = "List of recordings"))
+        self.window.add_widget(self.button)      
+        # self.window.add_widget(Label(text = "*List of recordings*"))
+        old_path = os.getcwd()
+        curr_path = os.getcwd() + "\Recordings"
+        os.chdir(curr_path)
+        list_of_files = os.listdir()
+        for index in range(0, len(list_of_files)):
+            self.button = Button(text = os.path.splitext(list_of_files[index])[0])
+            self.button.bind(on_press=self.recording)
+            self.window.add_widget(self.button)  
+        os.chdir(old_path)      
+        return self.window
+    
+    def recording(self, instance):
+        print(instance)
+        self.window.clear_widgets()
+        #self.window.add_widget(Image(source = ''))
+        self.button = Button(text = "Go back")
+        self.button.bind(on_press=self.view_recordings)
+        self.window.add_widget(self.button) 
+        self.button1 = Button(text = 'Original recording')
+        #self.button1.bind(on_press=self.view_recordings)
+        self.window.add_widget(self.button1)
+        self.button2 = Button(text = 'Summary')
+        self.window.add_widget(self.button2)
+        #self.user = TextInput()
         return self.window
 
 if __name__ == '__main__':
-    Interface().run()
+    SpeechApp().run()
