@@ -23,8 +23,13 @@ def speechToText():
         except Exception:
             continue
 
-
-    name=sys.path[0]+"\\Recordings\\TextFile_" + str(datetime.today().strftime("%Y_%m_%d"))+"_"+str(datetime.now().strftime("%H_%M_%S"))+".txt"
+    dir_path=sys.path[0]+"\\Recordings"
+    if os.dir_path.isdir(dir_path)==False:
+        os.mkdir(dir_path)
+    dir_path+=("\\"+str(datetime.today().strftime("%Y_%m_%d"))+"_"+str(datetime.now().strftime("%H_%M_%S")))
+    os.mkdir(dir_path)
+    name=dir_path+"\\TextFile.txt"
     f=open(name,"w")
     f.write(resText)
+    #there will be a summarizedFile.txt in dir_path 
     f.close()
