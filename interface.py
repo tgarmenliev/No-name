@@ -28,7 +28,7 @@ class SpeechApp(App):
     
     def stop_button(self, instance):
         recordingState.in_progress = True
-        self.button = Button(text = 'Stop recording')
+        self.button = Button(text = 'Stop recording', font_size ="25sp")
         self.button.bind(on_press = self.stop_recording)
         self.window.add_widget(self.button)
         return self.window
@@ -46,10 +46,10 @@ class SpeechApp(App):
     def main_page(self, instance):
         self.window.clear_widgets()
         self.window.orientation = 'horizontal'
-        self.button1 = Button(text = 'View recordings')
+        self.button1 = Button(text = 'View recordings', font_size ="30sp")
         self.button1.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button1)
-        self.button2 = Button(text = 'Make new recording')
+        self.button2 = Button(text = 'Make new recording', font_size ="30sp")
         self.button2.bind(on_press = self.start_recording)
         self.window.add_widget(self.button2)
         return self.window
@@ -57,7 +57,7 @@ class SpeechApp(App):
     def build(self):
         self.window = BoxLayout()
         self.window.cols = 2
-        self.button = Button(text = 'Get started')
+        self.button = Button(text = 'Get started', font_size ="30sp")
         self.button.bind(on_press=self.main_page)
         self.window.add_widget(self.button)
         return self.window
@@ -65,7 +65,7 @@ class SpeechApp(App):
     def view_recordings(self, instance):
         self.window.clear_widgets()
         self.window.orientation = 'vertical'
-        self.button = Button(text = "Go back")
+        self.button = Button(text = "Go back", font_size ="30sp")
         self.button.bind(on_press=self.main_page)
         self.window.add_widget(self.button)
         self.buttons=[]      
@@ -77,7 +77,7 @@ class SpeechApp(App):
         list_of_files.reverse()
        # self.path=list_of_files
         for index in range(0,len(list_of_files)):
-            self.buttons.append(Button(text = list_of_files[index]))
+            self.buttons.append(Button(text = list_of_files[index], font_size ="30sp"))
             self.buttons[index].bind(on_press=partial(self.recording,path=list_of_files[index]))
             self.window.add_widget(self.buttons[index])  
         os.chdir(old_path)      
@@ -88,12 +88,12 @@ class SpeechApp(App):
         path=kwargs.get("path")
         self.window.clear_widgets()
         self.window.orientation = 'vertical'
-        self.button = Button(text = "Go back")
+        self.button = Button(text = "Go back", font_name="Arial", font_size ="25sp")
         self.button.bind(on_press=partial(self.recording,path=path))
         self.window.add_widget(self.button)
         textfile=open("Recordings\\"+path+"\\TextFile.txt","r")
         text=textfile.read()
-        self.label=Label(text=text)
+        self.label=Label(text=text, font_size ="25sp", color=(0.882, 0.439, 0.322, 1), font_name="Arial")
         self.window.add_widget(self.label)
         textfile.close()
         return self.window
@@ -102,15 +102,15 @@ class SpeechApp(App):
         #print(instance)
         self.window.clear_widgets()
         #self.window.add_widget(Image(source = ''))
-        self.button = Button(text = "Go back")
+        self.button = Button(text = "Go back", font_size ="25sp")
         self.button.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button) 
-        self.button1 = Button(text = 'Original recording')
+        self.button1 = Button(text = 'Original recording', font_size ="25sp")
         path=kwargs.get("path")
         self.button1.bind(on_press=partial(self.view_original_text,path=path))
         #self.button1.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button1)
-        self.button2 = Button(text = 'Summary')
+        self.button2 = Button(text = 'Summary', font_size ="25sp")
         self.window.add_widget(self.button2)
         #self.user = TextInput()
         return self.window
