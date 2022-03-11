@@ -10,8 +10,9 @@ from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
+from kivy.lang import Builder
+from kivy.core.window import Window
 
-from functools import partial
 
 import os
 import sys
@@ -21,15 +22,50 @@ import recordingState
 import STT
 from STT import speechToText
 
+Window.clearcolor = '#0C0521'
+
+kv="""
+<RoundedButton@Button>:
+    background_color: 0,0,0,0  # the last zero is the critical on, make invisible
+    canvas.before:
+        Color:
+            rgba: (.882,.439,.322,1) if self.state=='normal' else (.055,.09,.02,1)  # visual feedback of press
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20,]
+<PlayButton@Button>:
+    background_color: 0,0,0,0  # the last zero is the critical on, make invisible
+    canvas.before:
+        Color:
+            rgba: (.882,.439,.322,1) if self.state=='normal' else (.055,.09,.02,1)  # visual feedback of press
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20,]
+            source: "images/play_icon.png"
+"""
+
+class PlayButton(Button):
+    pass
+
+class RoundedButton(Button):
+    pass
+
+Builder.load_string(kv)
+
 class SpeechApp(App):
+    i = 0
     def stop_recording(self, instance):
         recordingState.in_progress = False
         self.main_page(instance)
     
     def stop_button(self, instance):
         recordingState.in_progress = True
-        self.button = Button(text = 'Stop recording', font_size ="25sp")
-        self.button.bind(on_press = self.stop_recording)
+        #self.button = Button(text = 'Stop recording')
+        #self.button.bind(on_press = self.stop_recording)
+        self.button = RoundedButton(text = 'Stop recording', on_press=self.stop_recording, font_size = "22sp",
+                                    size_hint=(.5, .3), pos_hint={'center_x':.5, 'center_y': .5}, bold = True)
         self.window.add_widget(self.button)
         return self.window
     
@@ -43,74 +79,65 @@ class SpeechApp(App):
         self.speech_to_text()
         return self.window
     
+    def start_button(self, instance):
+        self.window.clear_widgets()
+        self.button1 = RoundedButton(text = 'Start recording', on_press=self.start_recording, font_size = "22sp",
+                                    size_hint=(.7, .5), pos_hint={'center_x':.5, 'center_y': .5}, bold = True)
+        self.window.add_widget(self.button1)
+        self.button2 = RoundedButton(text = 'Back', on_press=self.main_page, font_size = "22sp",
+                                    size_hint=(.2, .1), pos_hint={'center_x':.02, 'center_y': .95}, bold = True)
+        self.window.add_widget(self.button2)
+        return self.window
+
     def main_page(self, instance):
         self.window.clear_widgets()
         self.window.orientation = 'horizontal'
-        self.button1 = Button(text = 'View recordings', font_size ="30sp")
-        self.button1.bind(on_press=self.view_recordings)
+        self.button1 = RoundedButton(text = 'View recordings', on_press=self.view_recordings, font_size = "22sp",
+                                    size_hint=(.55, .9), pos_hint={'center_x':.15, 'center_y': .5}, bold = True)
         self.window.add_widget(self.button1)
-        self.button2 = Button(text = 'Make new recording', font_size ="30sp")
-        self.button2.bind(on_press = self.start_recording)
+        self.button2 = RoundedButton(text = 'Make new recording', on_press=self.start_button, font_size = "22sp",
+                                    size_hint=(.55, .9), pos_hint={'center_x': .85, 'center_y': .5}, bold = True)
         self.window.add_widget(self.button2)
         return self.window
 
     def build(self):
-        self.window = BoxLayout()
-        self.window.cols = 2
-        self.button = Button(text = 'Get started', font_size ="30sp")
-        self.button.bind(on_press=self.main_page)
+        self.window = FloatLayout()
+        self.window.size_hint = (0.7, 0.8)
+        self.window.pos_hint = {"center_x": 0.5, "center_y": 0.5}
+        self.button = RoundedButton(text = 'Get started', on_press=self.main_page, font_size = "22sp",
+                                    size_hint=(.5, .3), pos_hint={'center_x':.5, 'center_y': .5}, bold = True)
         self.window.add_widget(self.button)
         return self.window
 
     def view_recordings(self, instance):
         self.window.clear_widgets()
         self.window.orientation = 'vertical'
-        self.button = Button(text = "Go back", font_size ="30sp")
+        self.button = Button(text = "Go back")
         self.button.bind(on_press=self.main_page)
-        self.window.add_widget(self.button)
-        self.buttons=[]      
+        self.window.add_widget(self.button)      
         # self.window.add_widget(Label(text = "*List of recordings*"))
         old_path = os.getcwd()
         curr_path = os.getcwd() + "\Recordings"
         os.chdir(curr_path)
         list_of_files = os.listdir()
-        list_of_files.reverse()
-       # self.path=list_of_files
-        for index in range(0,len(list_of_files)):
-            self.buttons.append(Button(text = list_of_files[index], font_size ="30sp"))
-            self.buttons[index].bind(on_press=partial(self.recording,path=list_of_files[index]))
-            self.window.add_widget(self.buttons[index])  
+        for index in range(0, len(list_of_files)):
+            self.button = Button(text = list_of_files[index])
+            self.button.bind(on_press=self.recording(list_of_files[index]))
+            self.window.add_widget(self.button)  
         os.chdir(old_path)      
         return self.window
     
-    def view_original_text(self,*args,**kwargs):
-        #print(self.path[])
-        path=kwargs.get("path")
-        self.window.clear_widgets()
-        self.window.orientation = 'vertical'
-        self.button = Button(text = "Go back", font_name="Arial", font_size ="25sp")
-        self.button.bind(on_press=partial(self.recording,path=path))
-        self.window.add_widget(self.button)
-        textfile=open("Recordings\\"+path+"\\TextFile.txt","r")
-        text=textfile.read()
-        self.label=Label(text=text, font_size ="25sp", color=(0.882, 0.439, 0.322, 1), font_name="Arial")
-        self.window.add_widget(self.label)
-        textfile.close()
-        return self.window
-
-    def recording(self,*args,**kwargs):
+    def recording(self, path):
         #print(instance)
         self.window.clear_widgets()
         #self.window.add_widget(Image(source = ''))
-        self.button = Button(text = "Go back", font_size ="25sp")
+        self.button = Button(text = "Go back")
         self.button.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button) 
-        self.button1 = Button(text = 'Original recording', font_size ="25sp")
-        path=kwargs.get("path")
-        self.button1.bind(on_press=partial(self.view_original_text,path=path))
+        self.button1 = Button(text = 'Original recording')
         #self.button1.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button1)
-        self.button2 = Button(text = 'Summary', font_size ="25sp")
+        self.button2 = Button(text = 'Summary')
         self.window.add_widget(self.button2)
         #self.user = TextInput()
         return self.window
