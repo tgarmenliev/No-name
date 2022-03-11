@@ -11,6 +11,8 @@ from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
 
+from functools import partial
+
 import os
 import sys
 from threading import Thread
@@ -65,27 +67,47 @@ class SpeechApp(App):
         self.window.orientation = 'vertical'
         self.button = Button(text = "Go back")
         self.button.bind(on_press=self.main_page)
-        self.window.add_widget(self.button)      
+        self.window.add_widget(self.button)
+        self.buttons=[]      
         # self.window.add_widget(Label(text = "*List of recordings*"))
         old_path = os.getcwd()
         curr_path = os.getcwd() + "\Recordings"
         os.chdir(curr_path)
         list_of_files = os.listdir()
-        for index in range(0, len(list_of_files)):
-            self.button = Button(text = list_of_files[index])
-            self.button.bind(on_press=self.recording)
-            self.window.add_widget(self.button)  
+        list_of_files.reverse()
+       # self.path=list_of_files
+        for index in range(0,len(list_of_files)):
+            self.buttons.append(Button(text = list_of_files[index]))
+            self.buttons[index].bind(on_press=partial(self.recording,path=list_of_files[index]))
+            self.window.add_widget(self.buttons[index])  
         os.chdir(old_path)      
         return self.window
     
-    def recording(self, instance):
-        print(instance)
+    def view_original_text(self,*args,**kwargs):
+        #print(self.path[])
+        path=kwargs.get("path")
+        self.window.clear_widgets()
+        self.window.orientation = 'vertical'
+        self.button = Button(text = "Go back")
+        self.button.bind(on_press=self.recording)
+        self.window.add_widget(self.button)
+        textfile=open("Recordings\\"+path+"\\TextFile.txt","r")
+        text=textfile.read()
+        self.label=Label(text=text)
+        self.window.add_widget(self.label)
+        textfile.close()
+        return self.window
+
+    def recording(self,*args,**kwargs):
+        #print(instance)
         self.window.clear_widgets()
         #self.window.add_widget(Image(source = ''))
         self.button = Button(text = "Go back")
         self.button.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button) 
         self.button1 = Button(text = 'Original recording')
+        path=kwargs.get("path")
+        self.button1.bind(on_press=partial(self.view_original_text,path=path))
         #self.button1.bind(on_press=self.view_recordings)
         self.window.add_widget(self.button1)
         self.button2 = Button(text = 'Summary')
