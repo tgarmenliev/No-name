@@ -89,7 +89,7 @@ class SpeechApp(App):
         self.window.clear_widgets()
         self.window.orientation = 'vertical'
         self.button = Button(text = "Go back")
-        self.button.bind(on_press=self.recording)
+        self.button.bind(on_press=partial(self.recording,path=path))
         self.window.add_widget(self.button)
         textfile=open("Recordings\\"+path+"\\TextFile.txt","r")
         text=textfile.read()
