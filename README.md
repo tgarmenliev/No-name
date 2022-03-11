@@ -1,4 +1,4 @@
-# HackTUES 2022 Project | Team Mi int
+# SpeechApp | Team Mi int
 
 
 
