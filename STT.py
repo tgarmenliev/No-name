@@ -31,7 +31,7 @@ def SpeechToText():
 #    index_file.write(str(index+1))
 #    index_file.close()
 
-    name=sys.path[0]+"\\Recordings\\TextFile_" + str(datetime.now().strftime("%H_%M_%S"))+".txt"
+    name=sys.path[0]+"\\Recordings\\TextFile_" + str(datetime.today().strftime("%Y_%M_%D"))+"_"+str(datetime.now().strftime("%H_%M_%S"))+".txt"
     f=open(name,"w")
     f.write(text)
     f.close()
