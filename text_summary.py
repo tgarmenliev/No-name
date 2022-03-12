@@ -5,7 +5,8 @@ from nltk.cluster.util import cosine_distance
 import numpy as np
 import networkx as nx
 import scipy as sp
-
+import sys
+from pathlib import Path
 
 def read_article(file_name):
     file = open(file_name, "r")
@@ -70,8 +71,13 @@ def generate_summary(file_name, top_n = 5):
     if num_lines <= 2:
         file_ptr = open(file_name, "r")
         string = file_ptr.read()
-        print("Summary:", string)
-        return string
+        path = Path(file_name)
+        name=str(path.parent.absolute())+"\\SummaryFile.txt"
+        f=open(name,"w")
+        f.write(". ".join(summerize_text))
+        f.close()
+        #print("Summary:", string)
+        #return string
 
     sentences = read_article(file_name)
     sentence_similarity_matrix = gen_sim_matrix(sentences, stop_words)
@@ -81,10 +87,16 @@ def generate_summary(file_name, top_n = 5):
     for i in range(top_n):
         summerize_text.append(" ".join(ranked_sentence[i][1]))
     
-    print("Summary: \n", ". ".join(summerize_text))
+    #print("Summary: \n", ". ".join(summerize_text))
+    path = Path(file_name)
+    #print(path.parent.absolute())
+    name=str(path.parent.absolute())+"\\SummaryFile.txt"
+    f=open(name,"w")
+    f.write(". ".join(summerize_text))
+    f.close()
     
 
 
 
 
-generate_summary("C:\\Users\\User\\Documents\\file.c\\ddz.txt", 2)
+#generate_summary("C:\\Users\\User\\Documents\\file.c\\ddz.txt", 2)
