@@ -31,10 +31,11 @@ class RecAUD:
             self.frames.append(data)
            # print("* recording")
             #self.main.update()
-
+        print("actually loop stopped")
         stream.close()
 
         wf = wave.open('test_recording.wav', 'wb')
+        print("create wave")
         wf.setnchannels(self.CHANNELS)
         wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
         wf.setframerate(self.RATE)
@@ -51,11 +52,13 @@ class RecAUD:
         
         print("start\n")
         #self.start_record()
-        Thread(target=self.start_record,args=()).start()
+        th=Thread(target=self.start_record,args=())
+        th.start()
         while recordingState.in_progress == True:
         #while  keyboard.read_key()!="a":
             pass
         self.stop()
+        th.join()
         print("loop stopped\n")
         with  speech_recognition.AudioFile(sys.path[0]+"\\test_recording.wav") as mic:
 
@@ -65,6 +68,8 @@ class RecAUD:
             resText=recogniser.recognize_google(audio)
             resText.lower()
             print(resText)
+            #mic.close()
+            #os.remove(sys.path[0]+"\\test_recording.wav")
 
         dir_path=sys.path[0]+"\\Recordings"
         if os.path.isdir(dir_path)==False:
