@@ -97,6 +97,8 @@ class RecAUD:
                 #os.remove("segment_recording_" + str(index) + ".wav")
         #os.remove(sys.path[0]+"\\test_recording.wav")
         os.remove("test_recording.wav")
+        for index in range(0, l):
+            os.remove("segment_recording_" + str(index) + ".wav")
         dir_path=sys.path[0]+"\\Recordings"
         if os.path.isdir(dir_path)==False:
             os.mkdir(dir_path)
