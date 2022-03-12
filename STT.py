@@ -13,6 +13,9 @@ import itertools
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
+import text_summary
+from text_summary import generate_summary
+
 def split(file):
     sound = AudioSegment.from_wav(file)
     # spliting audio files
@@ -87,9 +90,10 @@ class RecAUD:
                 text.lower()
                 #print(text)
                 resText+=(text + ". ")
-        #mic.close()
+                
+                #os.remove("segment_recording_" + str(index) + ".wav")
         #os.remove(sys.path[0]+"\\test_recording.wav")
-
+        os.remove("test_recording.wav")
         dir_path=sys.path[0]+"\\Recordings"
         if os.path.isdir(dir_path)==False:
             os.mkdir(dir_path)
@@ -99,6 +103,6 @@ class RecAUD:
         f=open(name,"w")
         f.write(resText)
         f.close()
-        #generate_summary(name,1)
+        generate_summary(name,l//3+1)
 
 #RecAUD().speechToText()
