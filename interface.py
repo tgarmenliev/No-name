@@ -46,9 +46,15 @@ kv="""
             size: self.size
             radius: [15,]
             source: "images/play_icon.png"
-GridLayout:
-    spacing: '20dp'
+<OriginalText@TextInput>
+    size_hint: (1, .9)
+    readonly: False
+    background_color: 0, 0, 0, 0
+    foreground_color: 1, 1, 1, 1
 """
+
+class OriginalText(TextInput):
+    pass
 
 class PlayButton(Button):
     pass
@@ -59,8 +65,22 @@ class RoundedButton(Button):
 Builder.load_string(kv)
 
 class SpeechApp(App):
+
+    # def on_enter(self, event):
+    #     #self.textinput.text
+    #     self.main_page(event)
+    # def name_recording(self):
+    #     self.window.clear_widgets()
+    #     self.textinput = TextInput(multiline = False, size_hint = (1, .07), pos_hint = {'center_x':.5, 'center_y': .5})#padding_y = (20,20)
+    #     self.textinput.bind(on_text_validate=self.on_enter)
+    #     self.window.add_widget(Label(text = "Please name recording:", pos_hint = {'center_x':.5, 'center_y': .6}, font_size = "22sp"))
+    #     self.window.add_widget(self.textinput)
+    #     return self.window
+        
+
     def stop_recording(self, instance):
         recordingState.in_progress = False
+        #self.name_recording()
         self.main_page(instance)
     
     def stop_button(self, instance):
@@ -120,7 +140,8 @@ class SpeechApp(App):
             os.mkdir(curr_path)
         os.chdir(curr_path)
         list_of_files = os.listdir()
-        layout = GridLayout(size_hint_y = None, cols = 1,height = (Window.height/10)*len(list_of_files), width = Window.width) 
+        layout = GridLayout(size_hint_y = None, cols = 1,height = (Window.height/10 + 10)*len(list_of_files), width = Window.width) 
+        layout.spacing = [5, 10]
         #layout.bind(minimum_height = self.window.setter('height'))
        # layout.orientation = 'vertical'
         self.button = RoundedButton(text = "Go back", on_press = self.main_page, font_size = "22sp",
@@ -152,7 +173,22 @@ class SpeechApp(App):
         self.window.add_widget(self.button)
         textfile = open("Recordings\\"+path+"\\TextFile.txt","r")
         text = textfile.read()
-        self.label = Label(text = text)
+        self.label = OriginalText(text = text, font_size = "22sp", pos_hint = {'center_x': 0.5, 'center_y': 0.4}, font_name="Arial")
+        self.window.add_widget(self.label)
+        textfile.close()
+        return self.window
+
+    def view_summarized_text(self,*args,**kwargs):
+        path = kwargs.get("path")
+        self.window.clear_widgets()
+        self.window.orientation = 'vertical'
+        self.button = RoundedButton(text = "Go back", on_press = partial(self.recording, path = path), font_size = "22sp",
+                                    size_hint = (.2, .1), pos_hint = {'center_x':0, 'center_y': 1}, bold = True)
+        #self.button.bind(on_press=partial(self.recording,path=path))
+        self.window.add_widget(self.button)
+        textfile = open("Recordings\\"+path+"\\SummaryFile.txt","r")
+        text = textfile.read()
+        self.label = OriginalText(text = text, font_size = "22sp", pos_hint = {'center_x': 0.5, 'center_y': 0.4}, font_name="Arial")
         self.window.add_widget(self.label)
         textfile.close()
         return self.window
@@ -173,6 +209,7 @@ class SpeechApp(App):
         self.window.add_widget(self.button1)
         self.button2 = RoundedButton(text = 'Summary', font_size = "22sp",
                             size_hint = (.7, .3), pos_hint = {'center_x':.5, 'center_y': .2}, bold = True)
+        self.button2.bind(on_press = partial(self.view_summarized_text,path = path))
         self.window.add_widget(self.button2)
         #self.user = TextInput()
         return self.window
