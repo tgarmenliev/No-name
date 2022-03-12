@@ -157,6 +157,21 @@ class SpeechApp(App):
         textfile.close()
         return self.window
 
+    def view_summarized_text(self,*args,**kwargs):
+        path = kwargs.get("path")
+        self.window.clear_widgets()
+        self.window.orientation = 'vertical'
+        self.button = RoundedButton(text = "Go back", on_press = partial(self.recording, path = path), font_size = "22sp",
+                                    size_hint = (.2, .1), pos_hint = {'center_x':0, 'center_y': 1}, bold = True)
+        #self.button.bind(on_press=partial(self.recording,path=path))
+        self.window.add_widget(self.button)
+        textfile = open("Recordings\\"+path+"\\SummaryFile.txt","r")
+        text = textfile.read()
+        self.label = Label(text = text)
+        self.window.add_widget(self.label)
+        textfile.close()
+        return self.window
+
     def recording(self,*args,**kwargs):
         #print(instance)
         self.window.clear_widgets()
@@ -173,6 +188,7 @@ class SpeechApp(App):
         self.window.add_widget(self.button1)
         self.button2 = RoundedButton(text = 'Summary', font_size = "22sp",
                             size_hint = (.7, .3), pos_hint = {'center_x':.5, 'center_y': .2}, bold = True)
+        self.button2.bind(on_press = partial(self.view_summarized_text,path = path))
         self.window.add_widget(self.button2)
         #self.user = TextInput()
         return self.window
