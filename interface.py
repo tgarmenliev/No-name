@@ -46,9 +46,15 @@ kv="""
             size: self.size
             radius: [15,]
             source: "images/play_icon.png"
-GridLayout:
-    spacing: '20dp'
+<OriginalText@TextInput>
+    size_hint: (1, .9)
+    readonly: True
+    background_color: 0, 0, 0, 0
+    foreground_color: 1, 1, 1, 1
 """
+
+class OriginalText(TextInput):
+    pass
 
 class PlayButton(Button):
     pass
@@ -120,7 +126,8 @@ class SpeechApp(App):
             os.mkdir(curr_path)
         os.chdir(curr_path)
         list_of_files = os.listdir()
-        layout = GridLayout(size_hint_y = None, cols = 1,height = (Window.height/10)*len(list_of_files), width = Window.width) 
+        layout = GridLayout(size_hint_y = None, cols = 1,height = (Window.height/10)*len(list_of_files), width = Window.width * 10, pos_hint = {'center_x':.5, 'center_y': .5})
+        layout.spacing = [5, 10] 
         #layout.bind(minimum_height = self.window.setter('height'))
        # layout.orientation = 'vertical'
         self.button = RoundedButton(text = "Go back", on_press = self.main_page, font_size = "22sp",
@@ -132,7 +139,7 @@ class SpeechApp(App):
        # self.path=list_of_files
         for index in range(0,len(list_of_files)):
             self.buttons.append(RoundedButton(text = list_of_files[index], size_hint_y = None, height = Window.height / 10, font_size = "22sp",
-                                            pos_hint = {'center_x':0, 'center_y': 1}, bold = True))
+                                            pos_hint = {'center_x':0, 'center_y': 1}, bold = True, width = Window.width * 10))
             self.buttons[index].bind(on_press = partial(self.recording,path=list_of_files[index]))
             layout.add_widget(self.buttons[index])  
         os.chdir(old_path) 
@@ -152,7 +159,8 @@ class SpeechApp(App):
         self.window.add_widget(self.button)
         textfile = open("Recordings\\"+path+"\\TextFile.txt","r")
         text = textfile.read()
-        self.label = Label(text = text)
+        # self.label = Label(text = text,  font_size ="25sp", color=(1, 1, 1, 1), pos_hint = {'center_x': 0.5, 'center_y': 0.8}, font_name="Arial")
+        self.label = OriginalText(text = text, font_size = "22sp", pos_hint = {'center_x': 0.5, 'center_y': 0.4}, font_name="Arial")
         self.window.add_widget(self.label)
         textfile.close()
         return self.window
