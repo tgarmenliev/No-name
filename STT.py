@@ -19,7 +19,7 @@ from text_summary import generate_summary
 def split(file):
     sound = AudioSegment.from_wav(file)
     # spliting audio files
-    audio_chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=-40 )
+    audio_chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=-50 )
     #loop is used to iterate over the output list
     for i, chunk in enumerate(audio_chunks):
         output_file = sys.path[0]+"\\segment_recording_{0}.wav".format(i)
@@ -86,7 +86,10 @@ class RecAUD:
                 audio=recogniser.record(mic)
                 recogniser.adjust_for_ambient_noise(mic)
                 #print(type(audio))
-                text=recogniser.recognize_google(audio)
+                try:
+                    text=recogniser.recognize_google(audio)
+                except:
+                    text=""
                 text.lower()
                 #print(text)
                 resText+=(text + ". ")
