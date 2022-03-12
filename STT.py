@@ -9,8 +9,22 @@ from threading import Thread
 import recordingState
 import pyaudio
 
-import text_summary
-from text_summary import generate_summary
+import itertools
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+
+def split(file):
+    sound = AudioSegment.from_wav(file)
+    # spliting audio files
+    audio_chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=-40 )
+    #loop is used to iterate over the output list
+    for i, chunk in enumerate(audio_chunks):
+        output_file = sys.path[0]+"\\segment_recording_{0}.wav".format(i)
+        print("Exporting file", output_file)
+        chunk.export(output_file, format="wav")
+    return len(audio_chunks)
+#import text_summary
+#from text_summary import generate_summary
 class RecAUD:
     def __init__(self, chunk=3024, frmat=pyaudio.paInt16, channels=1, rate=44100, py=pyaudio.PyAudio()):
         self.collections = []
@@ -59,17 +73,22 @@ class RecAUD:
             pass
         self.stop()
         th.join()
+        #wav_file = AudioSegment.from_file(sys.path[0]+"\\test_recording.wav", format = "wav") 
+        l=split(sys.path[0]+"\\test_recording.wav")
+        #for index in range(0, len(segments)):
+         #   segments[index].export("segment_" + index + ".wav")
         print("loop stopped\n")
-        with  speech_recognition.AudioFile(sys.path[0]+"\\test_recording.wav") as mic:
-
-            audio=recogniser.record(mic)
-            recogniser.adjust_for_ambient_noise(mic)
-            #print(type(audio))
-            resText=recogniser.recognize_google(audio)
-            resText.lower()
-            print(resText)
-            #mic.close()
-            #os.remove(sys.path[0]+"\\test_recording.wav")
+        for index in range(0, l):
+            with  speech_recognition.AudioFile("segment_recording_" + str(index) + ".wav") as mic:
+                audio=recogniser.record(mic)
+                recogniser.adjust_for_ambient_noise(mic)
+                #print(type(audio))
+                text=recogniser.recognize_google(audio)
+                text.lower()
+                #print(text)
+                resText+=(text + ". ")
+        #mic.close()
+        #os.remove(sys.path[0]+"\\test_recording.wav")
 
         dir_path=sys.path[0]+"\\Recordings"
         if os.path.isdir(dir_path)==False:
@@ -80,6 +99,6 @@ class RecAUD:
         f=open(name,"w")
         f.write(resText)
         f.close()
-       # generate_summary(name,1)
+        #generate_summary(name,1)
 
 #RecAUD().speechToText()
