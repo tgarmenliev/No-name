@@ -17,12 +17,15 @@ from kivy.core.window import Window
 from functools import partial
 
 import os
+from datetime import datetime
 import sys
 from threading import Thread
 
 import recordingState
 import STT
 from STT import RecAUD
+
+import functools
 
 Window.clearcolor = '#0C0521'
 
@@ -66,22 +69,21 @@ Builder.load_string(kv)
 
 class SpeechApp(App):
 
-    # def on_enter(self, event):
-    #     #self.textinput.text
-    #     self.main_page(event)
-    # def name_recording(self):
-    #     self.window.clear_widgets()
-    #     self.textinput = TextInput(multiline = False, size_hint = (1, .07), pos_hint = {'center_x':.5, 'center_y': .5})#padding_y = (20,20)
-    #     self.textinput.bind(on_text_validate=self.on_enter)
-    #     self.window.add_widget(Label(text = "Please name recording:", pos_hint = {'center_x':.5, 'center_y': .6}, font_size = "22sp"))
-    #     self.window.add_widget(self.textinput)
-    #     return self.window
+    def on_enter(self, event):
+        recordingState.textinput = self.textinput.text
+        self.main_page(event)
+    def name_recording(self):
+        self.window.clear_widgets()
+        self.textinput = TextInput(multiline = False, size_hint = (1, .07), pos_hint = {'center_x':.5, 'center_y': .5})#padding_y = (20,20)
+        self.textinput.bind(on_text_validate=self.on_enter)
+        self.window.add_widget(Label(text = "Please name recording:", pos_hint = {'center_x':.5, 'center_y': .6}, font_size = "22sp"))
+        self.window.add_widget(self.textinput)
+        return self.window
         
 
     def stop_recording(self, instance):
         recordingState.in_progress = False
-        #self.name_recording()
-        self.main_page(instance)
+        self.name_recording()
     
     def stop_button(self, instance):
         recordingState.in_progress = True
@@ -94,6 +96,7 @@ class SpeechApp(App):
         Thread(target=RecAUD().speechToText, args=()).start()
         return self.window
     
+
     def start_recording(self, instance):
         self.window.clear_widgets()
         self.stop_button(instance)
@@ -130,6 +133,19 @@ class SpeechApp(App):
         self.window.add_widget(self.button)
         return self.window
 
+    def creation_time(self, a, b):
+        statinfo = os.stat(a)
+        create_date_a = datetime.fromtimestamp(statinfo.st_ctime)
+        statinfo = os.stat(b)
+        create_date_b = datetime.fromtimestamp(statinfo.st_ctime)
+        #print(create_date_a, create_date_b)
+        if create_date_a > create_date_b:
+            return 1
+        elif create_date_a < create_date_b:
+            return -1
+        else:
+            return 0
+
     def view_recordings(self, instance):
         self.window.clear_widgets()
         #self.window.orientation = 'vertical'
@@ -148,9 +164,9 @@ class SpeechApp(App):
                             size_hint = (.2, .1), pos_hint = {'center_x':0, 'center_y': 1}, bold = True)
         self.window.add_widget(self.button)
         self.buttons=[]
-        
-        list_of_files.reverse()
-       # self.path=list_of_files
+        list_of_files.sort(reverse = True, key = functools.cmp_to_key(self.creation_time))#st_ctime
+        #list_of_files.reverse()
+        #self.path=list_of_files
         for index in range(0,len(list_of_files)):
             self.buttons.append(RoundedButton(text = list_of_files[index], size_hint_y = None, height = Window.height / 10, font_size = "22sp",
                                             pos_hint = {'center_x':0, 'center_y': 1}, bold = True))
